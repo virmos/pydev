@@ -1,0 +1,14 @@
+user -> nginx -> werkzeug(development server) -> flask
+werkzeug(dev), gunicorn (prod)
+
+wsgi (web server gateway interface): protocol how application forward requests to other applications and receive responses
+uwsgi: protocol (more efficient)
+uWSGI program
+
+gunicorn -> flask
+uvicorn -> fastapi
+uvicorn + gunicorn(worker class) -> fastapi
+
+flask: worker thread gets blocked while waiting for Database/API calls
+fastapi: start handling another request while waiting for a slow call to the Database/API
+
