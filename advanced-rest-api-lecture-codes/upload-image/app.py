@@ -62,6 +62,14 @@ api.add_resource(Image, "/image/<string:filename>")
 api.add_resource(AvatarUpload, "/upload/avatar")
 api.add_resource(Avatar, "/avatar/<int:user_id>")
 
+# oauth2
+api.add_resource(GithubLogin, "/login/github")
+api.add_resource(GithubAuthorize, "/login/github/authorized", endpoint="github.authorize")
+api.add_resource(SetPassword, "/user/password")
+
+# stripe payment
+api.add_resource(Order, "/order")
+
 if __name__ == "__main__":
     db.init_app(app)
     ma.init_app(app)

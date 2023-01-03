@@ -1,0 +1,13 @@
+psycopg2-binary
+Flask
+Flask-JWT-Extended
+Flask-RESTful
+Flask-SQLAlchemy
+Flask-OAuthlib
+Flask-marshmallow
+flask_uploads
+stripe
+python-dotenv
+marshmallow-sqlalchemy
+marshmallow
+authlib

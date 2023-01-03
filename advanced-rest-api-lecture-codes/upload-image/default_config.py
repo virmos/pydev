@@ -5,6 +5,7 @@ SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 PROPAGATE_EXCEPTIONS = True
 UPLOADED_IMAGES_DEST = os.path.join("static", "images")  # manage root folder
+SECRET_KEY = "change-this-key-in-the-application-config"
 JWT_SECRET_KEY = os.environ["JWT_SECRET_KEY"]
 JWT_BLOCKLIST_ENABLED = True
 JWT_BLOCKLIST_TOKEN_CHECKS = [
