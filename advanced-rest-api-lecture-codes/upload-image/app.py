@@ -8,11 +8,13 @@ from dotenv import load_dotenv
 from db import db
 from ma import ma
 from blocklist import BLOCKLIST
-from resources.user import UserRegister, UserLogin, User, TokenRefresh, UserLogout
+from resources.user import UserRegister, UserLogin, User, TokenRefresh, UserLogout, SetPassword
 from resources.item import Item, ItemList
 from resources.store import Store, StoreList
 from resources.confirmation import Confirmation, ConfirmationByUser
 from resources.image import ImageUpload, Image, AvatarUpload, Avatar
+from resources.github_login import GithubLogin, GithubAuthorize
+from resources.order import Order
 from libs.image_helper import IMAGE_SET
 
 
