@@ -10,7 +10,9 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-
+    networks:
+      - localnet  
+      
   broker0:
     image: confluentinc/cp-kafka:6.1.1
     hostname: broker0
@@ -28,7 +30,9 @@ services:
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_NUM_PARTITIONS: 3
-
+    networks:
+      - localnet  
+      
   broker1:
     image: confluentinc/cp-kafka:6.1.1
     hostname: broker1
@@ -46,7 +50,9 @@ services:
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_NUM_PARTITIONS: 3
-
+    networks:
+      - localnet  
+      
   broker2:
     image: confluentinc/cp-kafka:6.1.1
     hostname: broker2
@@ -64,6 +70,8 @@ services:
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_NUM_PARTITIONS: 3
+    networks:
+      - localnet
 
   schema-registry:
     image: confluentinc/cp-schema-registry:6.1.1
@@ -79,7 +87,9 @@ services:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker0:29092,broker1:29093,broker2:29094'
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
-
+    networks:
+      - localnet  
+      
   kafka-connect:
     # image: confluentinc/cp-kafka-connect-base:6.1.4
     build:
@@ -107,9 +117,38 @@ services:
       CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
       CONNECT_LOG4J_APPENDER_STDOUT_LAYOUT_CONVERSIONPATTERN: "[%d] %p %X{connector.context}%m (%c:%L)%n"
       CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components,/data/connect-jars
+    networks:
+      - localnet  
+
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb
+    hostname: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=developer
+      - MONGO_INITDB_ROOT_PASSWORD=Develop3r
+    restart: always
+    networks:
+      - localnet
+  
+  mongosh:
+    image: mongo:5.0
+    container_name: mongosh
+    entrypoint: "sleep infinity"
+    restart: always
+    networks:
+      - localnet
 
   cli-tools:
     image: confluentinc/cp-kafka:6.1.1
     container_name: cli-tools
     entrypoint: "sleep infinity"
     restart: always
+    networks:
+      - localnet  
+
+networks:
+  localnet:
+    attachable: true

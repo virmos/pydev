@@ -90,7 +90,7 @@ docker exec -it cli-tools kafka-topics --bootstrap-server broker0:29092 --create
 
 http PUT :8083/connectors/technologists/config @technologists.json -b
 
-9. conume with avro cli
+9. consume with avro cli
 
 docker exec -it schema-registry kafka-avro-console-consumer --bootstrap-server broker0:29092 --topic technologists --property "schema.registry.url=http://localhost:8081" --from-beginning
 
