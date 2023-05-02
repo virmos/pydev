@@ -251,3 +251,66 @@ def add_const(cl):
             raise ConstError("'"+instruction[1]+"' is a constant and cannot be reassigned!")               
                     
     return code_list, tuple(constants)
+
+'''
+def f(x):
+    const. A=5
+    A = A + 1
+    return A*x
+'''
+
+''' bytecode before
+2         0 LOAD_CONST               1 (5)
+          2 LOAD_GLOBAL              0 (const)
+          4 STORE_ATTR               1 (A)
+
+3         6 LOAD_FAST                1 (A)
+          8 LOAD_CONST               2 (1)
+         10 BINARY_ADD                 
+         12 STORE_FAST               1 (A)
+
+4        14 LOAD_FAST                1 (A)
+         16 LOAD_FAST                0 (x)
+         18 BINARY_MULTIPLY            
+         20 RETURN_VALUE
+'''
+
+''' bytecode after
+2         0 LOAD_CONST               1 (5)
+          2 NOP
+          4 STORE_FAST               1 (A)
+
+3         6 LOAD_FAST                1 (A)
+          8 LOAD_CONST               2 (1)
+         10 BINARY_ADD                 
+         12 STORE_FAST               1 (A)
+
+4        14 LOAD_FAST                1 (A)
+         16 LOAD_FAST                0 (x)
+         18 BINARY_MULTIPLY            
+         20 RETURN_VALUE
+'''
+
+def const(f):
+    '''
+    A decorator to apply add_const() to the bytecode of a target function.
+    
+    Parameters
+    =========================================
+    f (function): target function
+    
+    Returns
+    =========================================
+    function: the input function with a new code object and modified bytecode
+    '''
+    c = f.__code__
+    code_list = disassemble_to_list(c)
+    new_code_list, const_vars = add_const(code_list)
+    new_co_names = tuple(i for i in c.co_names if i not in const_vars + ('const',))
+    new_bytecode = assemble(new_code_list, c.co_consts, c.co_varnames + const_vars, new_co_names, c.co_freevars + c.co_cellvars)
+    
+    nc = types.CodeType(c.co_argcount, c.co_kwonlyargcount, c.co_nlocals+len(const_vars), c.co_stacksize, c.co_flags,
+                    new_bytecode, c.co_consts, new_co_names, c.co_varnames + const_vars, c.co_filename, c.co_name, 
+                    c.co_firstlineno, c.co_lnotab)
+    f.__code__ = nc
+    return f
