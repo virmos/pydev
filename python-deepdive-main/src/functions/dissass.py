@@ -192,3 +192,62 @@ OUTPUT:
  ['BINARY_ADD'],
  ['RETURN_VALUE']]
 """
+new_co_code= assemble(disassembled_bytecode, c.co_consts,
+                      c.co_varnames, c.co_names,
+                      c.co_cellvars+c.co_freevars)
+
+import types
+nc = types.CodeType(c.co_argcount, c.co_kwonlyargcount,
+                    c.co_nlocals, c.co_stacksize, c.co_flags,
+                    new_co_code, c.co_consts, c.co_names, 
+                    c.co_varnames, c.co_filename, c.co_name, 
+                    c.co_firstlineno, c.co_lnotab, 
+                    c.co_freevars, c.co_cellvars)
+f.__code__ = nc
+
+f(2,5)  # Output is 10 not 7
+
+
+class ConstError(Exception):
+    pass
+
+def add_const(cl):
+    '''Detects the declared constants and modifies the disassembled bytecode list after that. 
+    Raises an exception if that constat is reassigned.
+    
+    Parameters
+    =========================================
+    cl (list): disassembled bytecode list
+    
+    Returns
+    =========================================
+    tuple: a tuple of the modified bytecode list plus the tuple of constant variables
+    '''
+    code_list = cl.copy()
+    constants= []
+    indices = []
+    
+    # Find the variables declared as const. Add their name and index to constants and indices list
+    for index, instruction in enumerate(code_list[:-1]):
+        if instruction == ['LOAD_GLOBAL', 'const']:
+            code_list[index]=['NOP']
+            next_instruction = code_list[index+1] 
+            if (next_instruction[0]=='STORE_ATTR'):
+                if next_instruction[1] in constants:
+                    raise ConstError("You cannot declare a constant variable twice!")
+                else:
+                    constants.append(next_instruction[1])
+                    indices.append(index+1)
+                    code_list[index+1][0]='STORE_FAST'   
+            else:
+                raise ConstError("The constant variable should be assigned after declaration!")
+    
+    #If a constant variable has been reassigned then raise an exception
+    for index, instruction in enumerate(code_list[:-1]):
+        if (instruction[0] == 'LOAD_GLOBAL') and (instruction[1] in constants):
+            code_list[index][0] = 'LOAD_FAST'
+        if (instruction[0] == 'STORE_GLOBAL' or instruction[0] == 'STORE_FAST') and \
+        (instruction[1] in constants) and index not in indices:
+            raise ConstError("'"+instruction[1]+"' is a constant and cannot be reassigned!")               
+                    
+    return code_list, tuple(constants)
